@@ -36,6 +36,7 @@
   enterShell = ''
     hello         # Run scripts directly
     git --version # Use packages
+    export PYTHONPATH="$DEVENV_ROOT/src''${PYTHONPATH:+:$PYTHONPATH}"
   '';
 
   # https://devenv.sh/tasks/
