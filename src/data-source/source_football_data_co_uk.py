@@ -2,7 +2,6 @@ import itertools
 import os.path
 
 import pandas as pd
-import numbers as np
 
 
 def _build_url(league: str, season: int) -> str:
