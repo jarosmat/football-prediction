@@ -33,7 +33,7 @@ def download_data(leagues: list[str], seasons: list[int], columns: list[str] | N
                   force_download: bool = False,
                   include_season: bool = True) -> pd.DataFrame:
     if columns is None:
-        columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', ]
+        columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR']
 
     if not os.path.isfile(file_path) or force_download:
         fetch_data(leagues, seasons, file_path, columns, include_season)
