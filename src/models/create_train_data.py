@@ -86,16 +86,16 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
     """
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
     df = fd.download_data(leagues, seasons, columns, include_season=False)
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%y')
-    df.sort_value(by=['Date'])
+    df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
+    df.sort_values(by=['Date'])
 
     n_rows = len(df)
-    n_features = 10
+    n_features = window * 2
     res_X = np.zeros((n_rows, n_features))
     res_y = np.zeros((n_rows,))
     team_deque_dict: dict[str, deque[int]] = dict()
 
-    for i, div, date, ht, at, ftr in enumerate(df.itertuples()):
+    for i, div, date, ht, at, ftr in df.itertuples():
         if ht not in team_deque_dict:
             team_deque_dict[ht] = deque([-1 for _ in range(window)])
             # team_deque_dict[ht].append(convert_res_val(True, ftr))
@@ -103,7 +103,7 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
             team_deque_dict[at] = deque([-1 for _ in range(window)])
             # team_deque_dict[at].append(convert_res_val(False, ftr))
 
-        res_X[i] = np.ndarray(list(team_deque_dict[ht]) + list(team_deque_dict[at]))
+        res_X[i] = np.array(list(team_deque_dict[ht]) + list(team_deque_dict[at]))
         res_y[i] = convert_res_val_target(ftr)
 
         team_deque_dict[ht].popleft()
