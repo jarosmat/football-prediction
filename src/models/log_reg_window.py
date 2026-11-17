@@ -25,9 +25,16 @@ def main():
             ("model", sk.linear_model.LogisticRegressionCV(Cs=10, l1_ratios=(0,0.5,1), cv=5, scoring='neg_log_loss', n_jobs=8, solver='saga', max_iter=2000))
         ])
 
-        pipe.fit(X_train, y_train)
+        param_grid = {
+            "transformer__poly_home__degree": [2,3],
+            "transformer__poly_away__degree": [2,3]
+        }
+        cv = sk.model_selection.StratifiedKFold(n_splits=5)
+        grid = sk.model_selection.GridSearchCV(pipe, param_grid, cv=cv)
 
-        pred = pipe.predict_proba(X_validate)
+        grid.fit(X_train, y_train)
+
+        pred = grid.predict_proba(X_validate)
         log_loss = sk.metrics.log_loss(y_validate, pred)
 
         print(f"window size {sz}, log loss: {log_loss}")
@@ -40,7 +47,6 @@ def main():
             best_log_loss = log_loss
 
 if __name__ == "__main__":
-    print("da")
     main()
 
 
