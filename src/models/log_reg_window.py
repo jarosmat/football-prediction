@@ -8,6 +8,7 @@ from pathlib import Path
 import sklearn as sk
 
 import create_train_data
+import window_model
 
 
 @dataclass
@@ -132,7 +133,7 @@ def main(cfg: Config):
             print(f"window size {sz}, log loss: {log_loss}")
 
         if log_loss < best_log_loss:
-            best_model = grid.best_estimator_
+            best_model = window_model.WindowModel(sz, grid.best_estimator_)
             best_log_loss = log_loss
 
     if best_model is not None:
