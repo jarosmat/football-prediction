@@ -1,4 +1,6 @@
 import argparse
+import lzma
+import pickle
 import tomllib
 from dataclasses import dataclass, field, fields
 from pathlib import Path
@@ -37,6 +39,7 @@ class Config:
     seed: int = 42
     test_size: float = 0.2
     verbose: int = 1
+    output_path: str = "log_reg_window.model"
 
     grid: GridConfig = field(default_factory=GridConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
@@ -132,8 +135,11 @@ def main(cfg: Config):
             best_model = grid.best_estimator_
             best_log_loss = log_loss
 
-    if cfg.verbose >= 1:
-        print(f"best log loss: {best_log_loss}")
+    if best_model is not None:
+        with lzma.open(cfg.output_path, "wb") as f:
+            pickle.dump(best_model, f)
+        if cfg.verbose >= 1:
+            print(f"best log loss: {best_log_loss}, model saved to {cfg.output_path}")
 
 
 if __name__ == "__main__":
