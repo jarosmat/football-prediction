@@ -95,7 +95,7 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
     res_y = np.zeros((n_rows,))
     team_deque_dict: dict[str, deque[int]] = dict()
 
-    for i, div, date, ht, at, ftr in df.itertuples():
+    for i, (div, date, ht, at, ftr) in enumerate(df[columns].itertuples(index=False)):
         if ht not in team_deque_dict:
             team_deque_dict[ht] = deque([-1 for _ in range(window)])
             # team_deque_dict[ht].append(convert_res_val(True, ftr))

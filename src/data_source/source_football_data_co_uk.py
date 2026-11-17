@@ -25,7 +25,7 @@ def _get_league_season(league: str, season: int, columns: list[str], include_sea
 def fetch_data(leagues: list[str], seasons: list[int], file_path: str, columns: list[str], include_season: bool = True):
     data_frame_iterable = (_get_league_season(league, season, columns, include_season) for league, season in
                            itertools.product(leagues, seasons))
-    pd.concat(data_frame_iterable).to_csv(file_path)
+    pd.concat(data_frame_iterable).to_csv(file_path, index=False)
 
 
 def download_data(leagues: list[str], seasons: list[int], columns: list[str] | None = None,
