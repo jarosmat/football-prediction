@@ -7,6 +7,49 @@ import pandas as pd
 import data_source.source_football_data_co_uk as fd
 
 
+class MatchesIterator:
+
+    columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
+    def __init__(self, df: pd.DataFrame, window: int, reverse: bool = False):
+        self.window = window
+        self.df = df
+        df.sort_values(by=['Date'])
+        self.team_deque_dict: dict[str, deque[int]] = dict()
+        self.update = 1
+        self.i = 0
+        if reverse:
+            self.update = -1
+            self.i = len(df) - 1
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> tuple[np.ndarray, np.float64 | int]:
+        div, date, ht, at, ftr = self.df[self.columns].iloc[self.i]
+
+        if ht not in self.team_deque_dict:
+            self.team_deque_dict[ht] = deque([-1 for _ in range(self.window)])
+        if at not in self.team_deque_dict:
+            self.team_deque_dict[at] = deque([-1 for _ in range(self.window)])
+
+        res_X = np.array(list(self.team_deque_dict[ht]) + list(self.team_deque_dict[at]))
+        res_y = convert_res_val_target(ftr)
+
+        self.team_deque_dict[ht].popleft()
+        self.team_deque_dict[ht].append(convert_res_val(True, ftr))
+        self.team_deque_dict[at].popleft()
+        self.team_deque_dict[at].append(convert_res_val(False, ftr))
+
+        self.i += self.update
+
+        if self.i < 0:
+            self.i = len(self.df)
+        elif self.i >= len(self.df):
+            self.i = 0
+
+        return res_X, res_y
+
+
 def convert_res_val(home: bool, res: Literal['H', 'D', 'A']) -> int:
     """
 
@@ -84,31 +127,71 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
             2 away won
 
     """
-    columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
-    df = fd.download_data(leagues, seasons, columns, include_season=False)
+    df = fd.download_data(leagues, seasons, MatchesIterator.columns, include_season=False)
     df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
     df.sort_values(by=['Date'])
 
+    res_X, res_y = _build_team_form(df, window)
+    return res_X, res_y
+
+
+def _build_team_form(df: pd.DataFrame, window: int) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Build training data from specified data frame
+
+    Parameters
+    ----------
+    df - match data to process
+    columns - columns to include
+    window - number of previous mathces to include
+
+    Returns
+    -------
+    Training data
+
+    """
     n_rows = len(df)
     n_features = window * 2
     res_X = np.zeros((n_rows, n_features))
     res_y = np.zeros((n_rows,))
-    team_deque_dict: dict[str, deque[int]] = dict()
 
-    for i, (div, date, ht, at, ftr) in enumerate(df[columns].itertuples(index=False)):
-        if ht not in team_deque_dict:
-            team_deque_dict[ht] = deque([-1 for _ in range(window)])
-            # team_deque_dict[ht].append(convert_res_val(True, ftr))
-        if at not in team_deque_dict:
-            team_deque_dict[at] = deque([-1 for _ in range(window)])
-            # team_deque_dict[at].append(convert_res_val(False, ftr))
-
-        res_X[i] = np.array(list(team_deque_dict[ht]) + list(team_deque_dict[at]))
-        res_y[i] = convert_res_val_target(ftr)
-
-        team_deque_dict[ht].popleft()
-        team_deque_dict[ht].append(convert_res_val(True, ftr))
-        team_deque_dict[at].popleft()
-        team_deque_dict[at].append(convert_res_val(False, ftr))
+    for i,X,y in enumerate(MatchesIterator(df, window, False)):
+        res_X[i] = X
+        res_y[i] = y
 
     return res_X, res_y
+
+
+def create_windows_for_fixtures(leagues: list[str], season: int, fixtures: pd.DataFrame,
+                                window: int = 5) -> dict[tuple[str,str], tuple[list[int], list[int]]]:
+    """
+    Creates feature rows for matches that have not been played yet.
+
+    Parameters
+    ----------
+    leagues: what leagues need history
+    season: what season use for creating the history
+    fixtures: DataFrame with at least HomeTeam and AwayTeam columns (e.g. upcoming matches).
+    window: how many last matches per team to include.
+
+    Returns
+    -------
+    Data for inference
+    """
+    columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
+    df = fd.download_data(leagues, [season], columns, include_season=False)
+    df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
+    df.sort_values(by=['Date'])
+
+    mati = MatchesIterator(df,window)
+    for _ in mati:
+        pass
+
+    team_deque_dict = mati.team_deque_dict
+
+    res = {}
+    for ht, at in fixtures[['HomeTeam', 'AwayTeam']].itertuples(index=False):
+        home_form = team_deque_dict.get(ht, deque([-1] * window))
+        away_form = team_deque_dict.get(at, deque([-1] * window))
+        res[(ht, at)] = (list(home_form), list(away_form))
+    return res
