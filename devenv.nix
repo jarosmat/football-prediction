@@ -56,4 +56,8 @@
   # git-hooks.hooks.shellcheck.enable = true;
 
   # See full reference at https://devenv.sh/reference/options/
+  containers."shell" = {
+    name = "football-prediction-env";
+    registry = "docker://ghcr.io/jarosmat/";
+  };
 }
