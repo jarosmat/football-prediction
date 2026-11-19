@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: echo
         run: echo $PATH
+      - name: echo2
+        run: echo $GITHUB_PATH
       - name: ls
         run: ls / && ls /nix && ls /nix/store
       - name: Download trained model
