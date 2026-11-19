@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: echo
         run: echo $PATH
+      - name: ls
+        run: ls / && ls /nix && ls /nix/store
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
