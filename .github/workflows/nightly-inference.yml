@@ -18,8 +18,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-
+      - name: Checkout repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh repo clone ${{ github.repository }}
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
