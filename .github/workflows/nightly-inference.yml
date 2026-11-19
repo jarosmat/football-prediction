@@ -18,6 +18,8 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: echo
+        run: echo $PATH
       - name: Checkout repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
