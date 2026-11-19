@@ -12,8 +12,7 @@ class MatchesIterator:
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
     def __init__(self, df: pd.DataFrame, window: int, reverse: bool = False):
         self.window = window
-        self.df = df
-        df.sort_values(by=['Date'])
+        self.df = df.sort_values(by=['Date']).reset_index(drop=True)
         self.team_deque_dict: dict[str, deque[int]] = dict()
         self.update = 1
         self.i = 0
@@ -42,10 +41,8 @@ class MatchesIterator:
 
         self.i += self.update
 
-        if self.i < 0:
-            self.i = len(self.df)
-        elif self.i >= len(self.df):
-            self.i = 0
+        if self.i < 0 or self.i >= len(self.df):
+            raise StopIteration
 
         return res_X, res_y
 
@@ -129,7 +126,6 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
     """
     df = fd.download_data(leagues, seasons, MatchesIterator.columns, include_season=False)
     df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
-    df.sort_values(by=['Date'])
 
     res_X, res_y = _build_team_form(df, window)
     return res_X, res_y
@@ -155,7 +151,7 @@ def _build_team_form(df: pd.DataFrame, window: int) -> tuple[np.ndarray, np.ndar
     res_X = np.zeros((n_rows, n_features))
     res_y = np.zeros((n_rows,))
 
-    for i,X,y in enumerate(MatchesIterator(df, window, False)):
+    for i, (X, y) in enumerate(MatchesIterator(df, window, False)):
         res_X[i] = X
         res_y[i] = y
 
@@ -181,9 +177,8 @@ def create_windows_for_fixtures(leagues: list[str], season: int, fixtures: pd.Da
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
     df = fd.download_data(leagues, [season], columns, include_season=False)
     df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
-    df.sort_values(by=['Date'])
 
-    mati = MatchesIterator(df,window)
+    mati = MatchesIterator(df, window)
     for _ in mati:
         pass
 
