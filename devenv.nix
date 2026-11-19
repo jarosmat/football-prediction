@@ -5,7 +5,9 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [  
+  packages = [
+    pkgs.git
+    pkgs.gh
     pkgs.python3Packages.pandas
     pkgs.python3Packages.numpy
     pkgs.python3Packages.matplotlib
