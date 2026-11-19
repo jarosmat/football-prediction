@@ -61,5 +61,8 @@
   containers."shell" = {
     name = "football-prediction-env";
     registry = "docker://ghcr.io/jarosmat/";
+    Env = [
+      "PATH=${pkgs.gh}/bin:${pkgs.git}/bin:${pkgs.bash}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    ];
   };
 }
