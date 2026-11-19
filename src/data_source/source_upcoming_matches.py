@@ -49,13 +49,13 @@ def _team_name(team) -> str:
 
 
 def get_matches_played_today_dataframe(api_key: str, leagues: list[str],
-                                       on: date | None = None) -> pd.DataFrame:
+                                       day: date | None = None) -> pd.DataFrame:
     """
     Returns matches played on the given day (default: today) as a DataFrame with columns:
     League, Date, Time, HomeTeam, AwayTeam (team names as returned by the API).
     """
     rows = []
-    for league, matches in get_matches_played_today(api_key, leagues, on).items():
+    for league, matches in get_matches_played_today(api_key, leagues, day).items():
         for match in matches:
             rows.append({
                 "League": league,
