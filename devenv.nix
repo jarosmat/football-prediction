@@ -10,6 +10,7 @@
     pkgs.python3Packages.numpy
     pkgs.python3Packages.matplotlib
     pkgs.python3Packages.scikit-learn
+    pkgs.python3Packages.requests
   ];
 
   # https://devenv.sh/languages/
