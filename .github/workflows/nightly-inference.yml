@@ -1,0 +1,39 @@
+name: nightly-inference
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jarosmat/football-prediction-env:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download trained model
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: gh release download log_reg_window-v1 --pattern '*.model' --dir .
+
+      - name: Run inference
+        env:
+          API_NINJAS_KEY: ${{ secrets.APININJAS }}
+          PYTHONPATH: src
+        run: |
+          mkdir -p predictions
+          python src/models/inference_window_model.py \
+            --model log_reg_window_trained.model \
+            --output "predictions/$(date +%F).csv"
+
+      - name: Upload predictions as run artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: predictions-${{ github.run_id }}
+          path: predictions/*.csv
+          retention-days: 90
