@@ -18,6 +18,8 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: ls2
+        run: ls
       - name: echo
         run: echo $PATH
       - name: echo2
