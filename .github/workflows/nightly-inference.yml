@@ -13,8 +13,8 @@ jobs:
   predict:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v5
+#      - name: Checkout repo
+#        uses: actions/checkout@v5
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -29,14 +29,11 @@ jobs:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
         run: |
           docker run --rm \
-                      -v ${{ github.workspace }}:/workspace \
-                      -w /workspace \
                       -e GH_TOKEN \
                       -e API_NINJAS_KEY \
                       -e PYTHONPATH=src \
-                      --entrypoint /bin/bash \
                       ghcr.io/jarosmat/football-prediction-env:latest \
-                      bash -c "git config --global --add safe.directory /workspace && gh release download log_reg_window-v1 --pattern '*.model' --dir . && mkdir -p predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
+                      bash -c "gh release download log_reg_window-v1 --pattern '*.model' --dir . && mkdir -p predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
         with:
