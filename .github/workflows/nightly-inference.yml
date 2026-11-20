@@ -7,30 +7,26 @@ on:
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   predict:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/jarosmat/football-prediction-env:latest
-      options: --user root
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    defaults:
-      run:
-        shell: env /env/environment/devenv shell -- bash -e {0}
-        working-directory: /env
-#    env:
-#      HOME: /env
     steps:
-      - name: dir
-        run: echo "$PWD"
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: echo "$PWD" && cd "/env" && gh release download log_reg_window-v1 --pattern '*.model' --dir .
+        run: gh release download log_reg_window-v1 --pattern '*.model' --dir .
+
       - name: Run inference
         env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
@@ -38,8 +34,9 @@ jobs:
         run: |
           mkdir -p predictions
           python src/models/inference_window_model.py \
-          --model log_reg_window_trained.model \
-          --output "predictions/$(date +%F).csv"
+            --model log_reg_window_trained.model \
+            --output "predictions/$(date +%F).csv"
+
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
         with:
