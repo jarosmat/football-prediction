@@ -20,6 +20,7 @@ jobs:
     defaults:
       run:
         shell: env /env/environment/devenv shell -- bash -e {0}
+        working-directory: /env
     steps:
       - name: Download trained model
         env:
