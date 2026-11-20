@@ -19,7 +19,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: path update
-        run: echo "${PWD}/environment" >> "${GITHUB_PATH}"
+        run: echo "${PWD}/environment" >> "$GITHUB_PATH"
       - name: ls2
         run: ls
       - name: echo
