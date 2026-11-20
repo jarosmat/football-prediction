@@ -17,10 +17,9 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    defaults:
-      run:
-        shell: export PATH="${PWD}/environment:${PATH}" && devenv shell bash -- -e {0}
     steps:
+      - name: path update
+        run: export GITHUB_PATH="${PWD}/environment:${GITHUB_PATH}"
       - name: ls2
         run: ls
       - name: echo
