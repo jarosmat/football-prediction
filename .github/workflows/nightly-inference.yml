@@ -17,9 +17,11 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-#    defaults:
-#      run:
-#        shell: ${{ env.DEVENV_PROFILE }}/devenv shell bash -- -e {0}
+    env:
+      PATH: "${{ env.DEVENV_PROFILE }}:${{ env.PATH }}"
+    defaults:
+      run:
+        shell: devenv shell bash -- -e {0}
     steps:
       - name: ls2
         run: ls
