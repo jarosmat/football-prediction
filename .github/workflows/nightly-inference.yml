@@ -12,6 +12,11 @@ permissions:
 jobs:
   predict:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jarosmat/football-prediction-env:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:
         shell: /entrypoint bash -e {0}
