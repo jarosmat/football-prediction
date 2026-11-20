@@ -14,22 +14,25 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: devenv shell -- bash -e {0}
+        shell: /entrypoint bash -e {0}
+#        shell: devenv shell -- bash -e {0}
     steps:
-      - uses: actions/checkout@v5
-      - uses: cachix/install-nix-action@v31
+#      - uses: actions/checkout@v5
+#      - uses: cachix/install-nix-action@v31
       #      - uses: cachix/cachix-action@v16p
       #        with:
       #          name: devenv
-      - name: Cache Nix Store
-        uses: nix-community/cache-nix-action@v6
-        with:
-          primary-key: devenv-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/devenv.lock') }}
-          restore-prefixes-first-match: devenv-${{ runner.os }}-
-          gc-max-store-size-linux: 3000000000
-      - name: Install devenv.sh
-        shell: bash
-        run: nix profile add nixpkgs#devenv
+#      - name: Cache Nix Store
+#        uses: nix-community/cache-nix-action@v6
+#        with:
+#          primary-key: devenv-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/devenv.lock') }}
+#          restore-prefixes-first-match: devenv-${{ runner.os }}-
+#          gc-max-store-size-linux: 3000000000
+#      - name: Install devenv.sh
+#        shell: bash
+#        run: nix profile add nixpkgs#devenv
+      - name: debug
+        run: ls -al && echo $PWD
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
