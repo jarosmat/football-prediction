@@ -31,8 +31,8 @@ jobs:
 #      - name: Install devenv.sh
 #        shell: bash
 #        run: nix profile add nixpkgs#devenv
-      - name: debug
-        run: ls -al
+#      - name: debug
+#        run: ls
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
