@@ -17,11 +17,9 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    env:
-      PATH: "${{ env.DEVENV_PROFILE }}:${{ env.PATH }}"
     defaults:
       run:
-        shell: devenv shell bash -- -e {0}
+        shell: devenv shell bash -- --init-file <(echo 'export PATH="$DEVENV_PROFILE/bin:$PATH"') -e {0}
     steps:
       - name: ls2
         run: ls
