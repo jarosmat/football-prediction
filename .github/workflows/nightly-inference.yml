@@ -38,7 +38,7 @@ jobs:
                       -e API_NINJAS_KEY \
                       -e PYTHONPATH=src \
                       ghcr.io/jarosmat/football-prediction-env:latest \
-                      bash -c "mkdir -p predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
+                      bash -c "mkdir predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
         with:
