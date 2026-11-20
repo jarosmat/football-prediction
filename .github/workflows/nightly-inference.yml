@@ -19,7 +19,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: xddd
-        run: ls -al
+        run: ls -al && echo "$PWD"
       - name: idk
         run: echo "${GITHUB_PATH}"
       - name: xd
