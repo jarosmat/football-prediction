@@ -33,7 +33,7 @@ jobs:
                       -e API_NINJAS_KEY \
                       -e PYTHONPATH=src \
                       ghcr.io/jarosmat/football-prediction-env:latest \
-                      bash -c "gh release download log_reg_window-v1 --pattern '*.model' --dir . && mkdir -p predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
+                      bash -c "echo \$GH_TOKEN | gh auth login --with-token && gh release download log_reg_window-v1 --pattern '*.model' --dir . && mkdir -p predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
         with:
