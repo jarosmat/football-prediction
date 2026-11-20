@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   predict:
+    environment: inference
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
