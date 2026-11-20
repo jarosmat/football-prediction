@@ -22,8 +22,8 @@ jobs:
       run:
         shell: env /env/environment/devenv shell -- bash -e {0}
         working-directory: /env
-    env:
-      HOME: /env
+#    env:
+#      HOME: /env
     steps:
       - name: dir
         run: echo "$PWD"
