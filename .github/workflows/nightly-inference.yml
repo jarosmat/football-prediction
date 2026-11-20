@@ -18,14 +18,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v16
+      #      - uses: cachix/cachix-action@v16p
+      #        with:
+      #          name: devenv
+      - name: Cache Nix Store
+        uses: nix-community/cache-nix-action@v6
         with:
-          name: devenv
+          primary-key: devenv-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/devenv.lock') }}
+          restore-prefixes-first-match: devenv-${{ runner.os }}-
+          gc-max-store-size-linux: 3000000000
       - name: Install devenv.sh
         shell: bash
         run: nix profile add nixpkgs#devenv
       - name: Download trained model
-#        shell: devenv shell -- bash -e {0}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: gh release download log_reg_window-v1 --pattern '*.model' --dir .
