@@ -22,6 +22,8 @@ jobs:
         shell: env /env/environment/devenv shell -- bash -e {0}
         working-directory: /env
     steps:
+      - name: dir
+        run: echo "$PWD"
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
