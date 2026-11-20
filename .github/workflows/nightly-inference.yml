@@ -19,7 +19,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:
-        shell: devenv shell
+        shell: devenv shell bash -- -e {0}
     steps:
       - name: ls2
         run: ls
