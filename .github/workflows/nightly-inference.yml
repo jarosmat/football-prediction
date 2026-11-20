@@ -23,12 +23,17 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull Devenv Image
         run: docker pull ghcr.io/jarosmat/football-prediction-env:latest
-      - name: Download model and Run inference
+      - name: Source model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          gh release download log_reg_window-v1 --pattern '*.model' --dir ${{ github.workspace }}
+      - name: Run inference
+        env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
         run: |
           docker run --rm \
+                      -v ${{ github.workspace }}/log_reg_window_trained.model:/env/log_reg_window_trained.model \
                       -e GH_TOKEN \
                       -e API_NINJAS_KEY \
                       -e PYTHONPATH=src \
