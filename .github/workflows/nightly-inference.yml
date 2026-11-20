@@ -12,33 +12,23 @@ permissions:
 jobs:
   predict:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/jarosmat/football-prediction-env:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        shell: devenv shell -- bash -e {0}
     steps:
-      - name: xddd
-        run: ls -al && echo "$PWD"
-      - name: idk
-        run: echo "${GITHUB_PATH}"
-      - name: xd
-        run: cat "$GITHUB_PATH"
-      - name: path update
-        run: echo "${PWD}/environment" >> "$GITHUB_PATH"
-      - name: ls2
-        run: ls
-      - name: echo
-        run: echo $PATH && echo profile:${DEVENV_PROFILE}
-      - name: echo2
-        run: echo $GITHUB_PATH
-      - name: ls
-        run: ls / && ls /nix && ls /nix/store
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16p
+        with:
+          name: devenv
+      - name: Install devenv.sh
+        shell: bash
+        run: nix profile add nixpkgs#devenv
       - name: Download trained model
+#        shell: devenv shell -- bash -e {0}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: gh release download log_reg_window-v1 --pattern '*.model' --dir .
-
       - name: Run inference
         env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
@@ -46,9 +36,8 @@ jobs:
         run: |
           mkdir -p predictions
           python src/models/inference_window_model.py \
-            --model log_reg_window_trained.model \
-            --output "predictions/$(date +%F).csv"
-
+          --model log_reg_window_trained.model \
+          --output "predictions/$(date +%F).csv"
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
         with:
