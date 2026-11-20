@@ -32,7 +32,7 @@ jobs:
 #        shell: bash
 #        run: nix profile add nixpkgs#devenv
       - name: debug
-        run: ls -al && echo $PWD
+        run: ls -al
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
