@@ -12,33 +12,28 @@ permissions:
 jobs:
   predict:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jarosmat/football-prediction-env:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        shell: env /env/environment/devenv shell -- bash -e {0}
     steps:
-#      - name: Checkout repo
-#        uses: actions/checkout@v5
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull Devenv Image
-        run: docker pull ghcr.io/jarosmat/football-prediction-env:latest
-      - name: Source model
+      - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          gh release download log_reg_window-v1 --repo ${{ github.repository }} --pattern '*.model' --dir ${{ github.workspace }}
+        run: gh release download log_reg_window-v1 --pattern '*.model' --dir .
       - name: Run inference
         env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
+          PYTHONPATH: src
         run: |
-          docker run --rm \
-                      -v ${{ github.workspace }}/log_reg_window_trained.model:/log_reg_window_trained.model \
-                      -e GH_TOKEN \
-                      -e API_NINJAS_KEY \
-                      -e PYTHONPATH=src \
-                      ghcr.io/jarosmat/football-prediction-env:latest \
-                      bash -c "mkdir predictions && python src/models/inference_window_model.py --model /log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
+          mkdir -p predictions
+          python src/models/inference_window_model.py \
+          --model log_reg_window_trained.model \
+          --output "predictions/$(date +%F).csv"
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
         with:
