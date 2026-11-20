@@ -24,7 +24,7 @@ jobs:
       - name: ls2
         run: ls
       - name: echo
-        run: echo $PATH && echo "profile: ${DEVENV_PROFILE}"
+        run: echo $PATH && echo profile:${DEVENV_PROFILE}
       - name: echo2
         run: echo $GITHUB_PATH
       - name: ls
