@@ -19,7 +19,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:
-        shell: /entrypoint bash -e {0}
+        shell: env /entrypoint bash -e {0}
 #        shell: devenv shell -- bash -e {0}
     steps:
 #      - uses: actions/checkout@v5
