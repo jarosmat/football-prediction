@@ -27,7 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release download log_reg_window-v1 --pattern '*.model' --dir ${{ github.workspace }}
+          gh release download log_reg_window-v1 --repo ${{ github.repository }} --pattern '*.model' --dir ${{ github.workspace }}
       - name: Run inference
         env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
