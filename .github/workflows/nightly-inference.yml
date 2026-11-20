@@ -25,7 +25,7 @@ jobs:
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: gh release download log_reg_window-v1 --pattern '*.model' --dir .
+        run: echo "$PWD" && cd "/env" && gh release download log_reg_window-v1 --pattern '*.model' --dir .
       - name: Run inference
         env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
