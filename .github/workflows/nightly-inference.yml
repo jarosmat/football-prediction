@@ -34,6 +34,7 @@ jobs:
                       -e GH_TOKEN \
                       -e API_NINJAS_KEY \
                       -e PYTHONPATH=src \
+                      --entrypoint /bin/bash \
                       ghcr.io/jarosmat/football-prediction-env:latest \
                       bash -c "git config --global --add safe.directory /workspace && gh release download log_reg_window-v1 --pattern '*.model' --dir . && mkdir -p predictions && python src/models/inference_window_model.py --model log_reg_window_trained.model --output \"predictions/\$(date +%F).csv\""
       - name: Upload predictions as run artifact
