@@ -1,4 +1,4 @@
-name: nightly-inference
+name: container build
 
 on:
   push:
@@ -17,7 +17,13 @@ jobs:
     environment: inference
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: devenv
+      - name: Install devenv.sh
+        run: nix profile add nixpkgs#devenv
       - name: Build the container
         run: devenv container build shell
       - name: Push the container to registry
