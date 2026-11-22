@@ -3,11 +3,13 @@
 {
   # https://devenv.sh/basics/
   env.GREET = "devenv";
+  env.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 
   # https://devenv.sh/packages/
   packages = [
     pkgs.git
     pkgs.gh
+    pkgs.cacert
     pkgs.python3Packages.pandas
     pkgs.python3Packages.numpy
     pkgs.python3Packages.matplotlib
