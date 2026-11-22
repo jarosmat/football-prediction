@@ -21,7 +21,8 @@ jobs:
       - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v16
         with:
-          name: devenv
+          name: football-prediction
+          authToken: ${{ secrets.CACHIX_TOKEN }}
       - name: Install devenv.sh
         run: nix profile add nixpkgs#devenv
       - name: Build the container
