@@ -66,5 +66,9 @@
   containers."shell" = {
     name = "football-prediction-env";
     registry = "docker://ghcr.io/jarosmat/";
+    defaultCopyArgs = [
+      "--dest-creds"
+      "${ACTOR}:${GH_TOKEN}"
+    ];
   };
 }
