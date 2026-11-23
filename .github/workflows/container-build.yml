@@ -28,4 +28,4 @@ jobs:
       - name: Build the container
         run: devenv container build shell
       - name: Push the container to registry
-        run: devenv container copy --dest-creds "${{ github.actor }}:${{ secrets.GH_TOKEN }}" shell
+        run: devenv container copy shell -- --dest-creds "${{ github.actor }}:${{ secrets.GH_TOKEN }}"
