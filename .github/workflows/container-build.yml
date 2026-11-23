@@ -26,6 +26,9 @@ jobs:
       - name: Install devenv.sh
         run: nix profile add nixpkgs#devenv
       - name: Build the container
+        env:
+          ACTOR: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: devenv container build shell
       - name: Push the container to registry
         env:
