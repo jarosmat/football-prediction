@@ -68,7 +68,7 @@
     registry = "docker://ghcr.io/jarosmat/";
     defaultCopyArgs = [
       "--dest-creds"
-      "${ACTOR}:${GH_TOKEN}"
+      "$(echo $ACTOR):$(echo $GH_TOKEN)"
     ];
   };
 }
