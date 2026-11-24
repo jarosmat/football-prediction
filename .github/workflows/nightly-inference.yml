@@ -24,6 +24,7 @@ jobs:
           authToken: ${{ secrets.CACHIX_TOKEN }}
       - name: Install devenv.sh
         run: nix profile add nixpkgs#devenv
+        shell: bash
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
