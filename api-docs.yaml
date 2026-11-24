@@ -1,0 +1,12 @@
+# Config for generating docs via generate_api_docs.py.
+# use CLI flags to override these values.
+
+src: src
+output: docs/programmer.md
+
+# Dotted module paths to document, e.g.:
+#   modules:
+#     - models.window_model
+#     - data_source.team_names
+# Leave empty to auto-discover all modules under src.
+modules: []
