@@ -13,16 +13,14 @@ jobs:
     environment: inference
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
         with:
-          python-version: "3.14"
-          cache: pip
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
+          name: football-prediction
+          authToken: ${{ secrets.CACHIX_TOKEN }}
+      - name: Install devenv.sh
+        run: nix profile add nixpkgs#devenv
       - name: Download trained model
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
