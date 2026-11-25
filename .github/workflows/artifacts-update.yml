@@ -1,4 +1,4 @@
-name: container build
+name: artifacts build
 
 on:
   push:
