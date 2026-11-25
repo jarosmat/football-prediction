@@ -1,3 +1,11 @@
+"""
+Train a logistic regression on a sliding window of match results.
+
+The experiment is defined by a TOML config (see Config). CLI flags only override
+verbosity and parallelism. For each window size a model is trained and validated,
+and the best one (by validation log loss) is pickled to Config.output_path.
+"""
+
 import argparse
 import lzma
 import pickle
@@ -13,6 +21,16 @@ import window_model
 
 @dataclass
 class GridConfig:
+    """
+    Settings for the grid search over polynomial degrees.
+
+    Attributes:
+        poly_degrees (list[int]): degrees for the PolynomialFeatures of both teams
+        cv_splits (int): number of StratifiedKFold splits used in GridSearchCV
+        scoring (str): scoring metric for the grid search (default: neg_log_loss)
+        n_jobs (int): parallel jobs for GridSearchCV (-1 = all cores)
+        verbose (int): verbosity of GridSearchCV
+    """
     poly_degrees: list[int] = field(default_factory=lambda: [2, 3])
     cv_splits: int = 5
     scoring: str = "neg_log_loss"
@@ -22,6 +40,18 @@ class GridConfig:
 
 @dataclass
 class ModelConfig:
+    """
+    Settings for the LogisticRegressionCV model.
+
+    Attributes:
+        cs (int): number of candidate regularization strengths (log-spaced)
+        l1_ratios (list[float]): candidate L1 ratios for the elastic net penalty
+        cv (int): cross-validation folds inside LogisticRegressionCV
+        solver (str): solver for LogisticRegressionCV (default: saga, supports l1/elasticnet)
+        max_iter (int): maximum number of solver iterations
+        n_jobs (int): parallel jobs for LogisticRegressionCV (-1 = all cores)
+        verbose (int): verbosity of LogisticRegressionCV
+    """
     cs: int = 10
     l1_ratios: list[float] = field(default_factory=lambda: [0.0, 0.5, 1.0])
     cv: int = 5
@@ -33,6 +63,20 @@ class ModelConfig:
 
 @dataclass
 class Config:
+    """
+    Full experiment definition for training the window model.
+
+    Attributes:
+        window_sizes (list[int]): candidate window sizes, each is trained and validated separately
+        leagues (list[str]): football-data.co.uk league codes to train on
+        seasons (list[int]): seasons to train on, as in football-data.co.uk URLs
+        seed (int): random seed for the train/validation split and cross-validation
+        test_size (float): fraction of the data used for validation
+        verbose (int): 0 = silent, 1 = per-window log loss and a final summary
+        output_path (str): file the best WindowModel is pickled to (lzma-compressed)
+        grid (GridConfig): grid search settings
+        model (ModelConfig): model settings
+    """
     window_sizes: list[int] = field(default_factory=lambda: [3, 4, 5])
     leagues: list[str] = field(default_factory=lambda: ["E0", "D1"])
     seasons: list[int] = field(default_factory=lambda: [2021, 2122, 2223, 2324, 2425, 2526])
@@ -47,6 +91,16 @@ class Config:
 
     @classmethod
     def from_toml(cls, path: Path) -> Config:
+        """
+        Load a Config from a TOML file.
+
+        Parameters:
+            path (Path): TOML file with the experiment definition; the [grid] and [model]
+                tables override the nested configs, all other keys map to Config fields
+
+        Returns:
+            Config: the loaded config
+        """
         data = tomllib.loads(path.read_text())
         grid_data = data.pop("grid", {})
         model_data = data.pop("model", {})
@@ -57,10 +111,20 @@ class Config:
 
 
 def _field_names(dc) -> set[str]:
+    """Field names of a dataclass, used to filter TOML keys."""
     return {f.name for f in fields(dc)}
 
 
 def parse_args() -> Config:
+    """
+    Parse CLI arguments into a Config.
+
+    The TOML config (--config) defines the experiment; the CLI flags only override
+    verbosity and parallelism on top of it.
+
+    Returns:
+        Config: experiment config, built-in defaults if --config is omitted
+    """
     p = argparse.ArgumentParser(
         description="Train logistic regression on sliding window of match results. Everything that affects the model is defined in the TOML config, only verbosity and parallelism can be set from the CLI.")
     p.add_argument("--config", type=Path, default=None,
@@ -91,6 +155,17 @@ def parse_args() -> Config:
 
 
 def main(cfg: Config):
+    """
+    Train and validate a window model for each window size, save the best one.
+
+    For every window size in cfg.window_sizes a training matrix is built, split into
+    train/validation, and a GridSearchCV over the polynomial degrees is fitted. The
+    model with the lowest validation log loss is pickled (lzma-compressed) to
+    cfg.output_path.
+
+    Parameters:
+        cfg (Config): experiment definition
+    """
     best_model = None
     best_log_loss = float("inf")
 
