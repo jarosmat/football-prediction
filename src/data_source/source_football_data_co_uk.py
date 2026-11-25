@@ -56,10 +56,6 @@ def fetch_data(leagues: list[str], seasons: list[int], file_path: str, columns: 
         file_path (str): Where to save the downloaded data.
         columns (list[str]): What columns to include in the resulting DataFrame.
         include_season (bool): If the season should be included as a column of the DataFrame.
-
-    Returns:
-        Does not return, save the downloaded data into file_path
-
     """
     data_frame_iterable = (_get_league_season(league, season, columns, include_season) for league, season in
                            itertools.product(leagues, seasons))
@@ -71,9 +67,9 @@ def download_data(leagues: list[str], seasons: list[int], columns: list[str] | N
                   force_download: bool = False,
                   include_season: bool = True) -> pd.DataFrame:
     """
-   Fetches specified columns about leagues in seasons from football-data.co.uk and saves the data into file.
-   First checks whether a specified file_path is already present and contains requested data, if it does, just read the
-   existing data, otherwise fetches the data from the internet.
+    Fetches specified columns about leagues in seasons from football-data.co.uk and saves the data into file.
+    First checks whether a specified file_path is already present and contains requested data, if it does, just read the
+    existing data, otherwise fetches the data from the internet.
 
     Args:
         leagues (list[str]): Leagues to fetch the data about.
