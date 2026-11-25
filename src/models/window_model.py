@@ -1,11 +1,10 @@
 class WindowModel:
     """
-    Model for window of last match results
+    Model for window of last match results.
 
-    Attributes
-    ----------
-    window_size: how many last matches are in the window
-    pipeline: the fitted sklearn Pipeline.
+    Attributes:
+        window_size (int): how many last matches are in the window
+        pipeline (sklearn Pipeline): the fitted sklearn Pipeline.
     """
 
     def __init__(self, window_size: int, pipeline):
