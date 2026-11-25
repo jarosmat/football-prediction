@@ -8,6 +8,25 @@ import data_source.source_football_data_co_uk as fd
 
 
 class MatchesIterator:
+    """
+    Iterates over matches in date order, yielding the form window of both teams and the match result.
+
+    Parameters:
+        df (pd.DataFrame): match data, must contain the `columns` columns
+        window (int): how many previous matches per team are kept in the window
+        reverse (bool): if True, iterate from the newest match backwards
+
+    Attributes:
+        columns (list[str]): columns read from the data frame
+        window (int): window size, see Parameters
+        df (pd.DataFrame): the data frame, sorted by date
+        team_deque_dict (dict[str, deque[int]]): per-team deque with the last `window` results
+            (-1 = not enough previous matches, 0 = won, 1 = draw, 2 = lost)
+
+    Yields:
+        tuple[np.ndarray, np.float64 | int]: (X, y) where X is the concatenated home/away form
+            windows and y is the target result (0 = home won, 1 = draw, 2 = away won)
+    """
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
     def __init__(self, df: pd.DataFrame, window: int, reverse: bool = False):
         self.window = window
@@ -100,15 +119,15 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
 
     Returns:
         tuple[np.ndarray, np.ndarray]: train values and targets, values are first n values for window of
-        home team, then n values for window of away team, values are:
-        -1 did not play - only for windows where there weren't enough previous matches played
-        0 team won
-        1 draw
-        2 team lost
-        Targets have values of results of those matches, values are:
-        0 home won
-        1 draw
-        2 away won
+            home team, then n values for window of away team, values are:
+            -1 did not play - only for windows where there weren't enough previous matches played
+            0 team won
+            1 draw
+            2 team lost
+            Targets have values of results of those matches, values are:
+            0 home won
+            1 draw
+            2 away won
     """
     df = fd.download_data(leagues, seasons, MatchesIterator.columns, include_season=False)
     df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
