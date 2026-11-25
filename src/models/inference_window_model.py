@@ -12,6 +12,18 @@ import data_source.source_upcoming_matches as upcoming
 import data_source.team_names as team_names
 import window_model
 
+"""
+Module Runs inference on WindowModels. Run --help to see arguments.
+
+Attributes:
+    RESULT_LETTERS (list[str]): Letters specifying the result of a match:
+        - "H" - home team won
+        - "D" - draw
+        - "A" - away team won
+    API_TO_FD_LEAGUE (dict[str,str]): Translates the API Ninjas league name and football-data.co.uk league name.
+    CURRENT_SEASON (int): Specifies the current season.
+"""
+
 RESULT_LETTERS = ["H", "D", "A"]
 
 API_TO_FD_LEAGUE = {"epl": "E0"}
@@ -19,11 +31,28 @@ CURRENT_SEASON = 2627
 
 
 def load_model(path: Path) -> window_model.WindowModel:
+    """
+    Loads a WindowModel from specified file.
+
+    Args:
+        path (Path): Path to WindowModel.
+
+    Returns:
+        window_model.WindowModel: Loaded instance.
+
+    """
     with lzma.open(path, "rb") as f:
         return pickle.load(f)
 
 
 def parse_args() -> argparse.Namespace:
+    """
+    Parse the CLI args.
+
+    Returns:
+        argparse.Namespace: Parsed CLI args.
+
+    """
     p = argparse.ArgumentParser(description="Run inference with a saved WindowModel on today's matches.")
     p.add_argument("--model", type=Path, default=Path("log_reg_window.model"),
                    help="Path to the saved model.")
@@ -38,7 +67,13 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def main(args):
+def main(args: argparse.Namespace):
+    """
+    Run the inference on WindowModel.
+
+    Args (argparse.Namespace):
+        args: Arguments specifying how to run the inference.
+    """
     if not args.api_key:
         raise SystemExit("API Ninjas key required: pass --api-key or set API_NINJAS_KEY")
 
