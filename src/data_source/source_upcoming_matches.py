@@ -1,4 +1,5 @@
 from datetime import date
+from utils.protocols import Stringable
 
 import pandas as pd
 import requests
@@ -44,7 +45,17 @@ def get_matches_played_today(api_key: str, leagues: list[str], day: date | None 
     return all_matches
 
 
-def _team_name(team) -> str:
+def _team_name(team: dict[str, str] | Stringable) -> str:
+    """
+    Extracts team name from specified team.
+
+    Args:
+        team (dict[str, str] | Stringable): Team object to extract the data about.
+
+    Returns:
+        str: Either team name extracted from dictionary under key "name" or str representation of team parameter.
+
+    """
     return team["name"] if isinstance(team, dict) else str(team)
 
 
