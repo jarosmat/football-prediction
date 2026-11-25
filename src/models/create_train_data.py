@@ -24,7 +24,7 @@ class MatchesIterator:
             (-1 = not enough previous matches, 0 = won, 1 = draw, 2 = lost)
 
     Yields:
-        tuple[np.ndarray, np.float64 | int]: (X, y) where X is the concatenated home/away form
+        (tuple[np.ndarray, np.float64 | int]): (X, y) where X is the concatenated home/away form
             windows and y is the target result (0 = home won, 1 = draw, 2 = away won)
     """
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
