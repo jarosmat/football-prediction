@@ -4,6 +4,9 @@
 src: src
 output: docs/programmer.md
 
+# How to render docstring sections: "list" (bullet lists) or "table" (Markdown tables).
+format: list
+
 # Dotted module paths to document, e.g.:
 #   modules:
 #     - models.window_model
