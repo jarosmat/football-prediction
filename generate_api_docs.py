@@ -107,19 +107,41 @@ def _item_lines(label: str, desc) -> list[str]:
 
 def emit_section(section, out: list[str], fmt: str) -> None:
     name = type(section).__name__
+    value = section.value
     if name == "DocstringSectionText":
-        text = str(section.value).strip()
+        text = str(value).strip()
         if text:
             out.append(text)
             out.append("")
         return
 
+    admonitions = []
+    if type(value).__name__ == "DocstringAdmonition":
+        admonitions = [value]
+    elif isinstance(value, (list, tuple)) and value and all(
+        type(i).__name__ == "DocstringAdmonition" for i in value
+    ):
+        admonitions = list(value)
+    if admonitions:
+        # admonition sections (Note:, Warning:, ...): titled text blocks
+        for adm in admonitions:
+            out.append(f"**{str(adm.kind).capitalize()}:**")
+            out.append("")
+            desc = str(adm.description or "").strip()
+            if desc:
+                out.append(desc)
+                out.append("")
+        return
+
     title = SECTION_TITLES.get(name, name.replace("DocstringSection", ""))
     out.append(f"**{title}:**")
     out.append("")
-    value = section.value
     if isinstance(value, str):
         out.append(value.strip())
+        out.append("")
+        return
+    if not isinstance(value, (list, tuple)):
+        out.append(str(value))
         out.append("")
         return
     if name == "DocstringSectionExamples":
