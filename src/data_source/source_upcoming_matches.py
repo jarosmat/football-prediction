@@ -6,15 +6,15 @@ import requests
 
 def get_matches_played_today(api_key: str, leagues: list[str], day: date | None = None) -> dict[str, list[dict]]:
     """
-    Fetches matches that are played on this day in specified leagues
+    Fetches matches that are played on given day in specified leagues.
 
     Parameters:
-    - api_key (str): API Ninjas API key.
-    - leagues (list): A list of league codes.
-    - day (date): Day to fetch matches for, default is today.
+        api_key (str): API Ninjas API key.
+        leagues (list[str]): A list of league codes.
+        day (date | None): Day to fetch matches for, default is today.
 
     Returns:
-    - dict: league code -> list of raw match dicts from the API.
+        dict[str, list[dict]]: league code -> list of raw match dicts from the API.
     """
     url = "https://api.api-ninjas.com/v1/soccermatches"
     headers = {
@@ -51,8 +51,24 @@ def _team_name(team) -> str:
 def get_matches_played_today_dataframe(api_key: str, leagues: list[str],
                                        day: date | None = None) -> pd.DataFrame:
     """
-    Returns matches played on the given day (default: today) as a DataFrame with columns:
-    League, Date, Time, HomeTeam, AwayTeam (team names as returned by the API).
+    Returns matches played on the given day.
+
+    Args:
+        api_key (str): API Ninjas API key.
+        leagues (list[str]): A list of league codes.
+        day (date | None): Day to fetch matches for, default is today.
+
+    Notes:
+          - Team names are returned in the API Ninjas format.
+          - Returns the same values as `get_matches_played_today` but serialized in DataFrame.
+
+    Returns:
+        pd.DataFrame: DataFrame with columns:
+            - League
+            - Date
+            - Time
+            - HomeTeam
+            - AwayTeam
     """
     rows = []
     for league, matches in get_matches_played_today(api_key, leagues, day).items():
