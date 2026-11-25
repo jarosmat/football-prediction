@@ -1,0 +1,61 @@
+name: container build
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - 'master'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-container:
+    environment: inference
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: football-prediction
+          authToken: ${{ secrets.CACHIX_TOKEN }}
+      - name: Install devenv.sh
+        run: nix profile add nixpkgs#devenv
+      - name: Build the container
+        run: devenv container build shell
+      - name: Push the container to registry
+        env:
+          ACTOR: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: devenv container copy shell
+  build-docs:
+    environment: inference
+    defaults:
+      run:
+        shell: devenv shell -- bash -e {0}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: football-prediction
+          authToken: ${{ secrets.CACHIX_TOKEN }}
+      - name: Install devenv.sh
+        run: nix profile add nixpkgs#devenv
+        shell: bash
+      - name: Build the docs
+        run: python3 generate_api_docs.py
+      - name: Commit generated docs
+        run: |
+          git config user.name ${{ github.actor }} 
+          git add docs/*.md
+          git commit -m "Update docs [skip ci]"
+          git push origin HEAD
+
