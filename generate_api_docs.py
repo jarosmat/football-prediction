@@ -79,6 +79,7 @@ def visible(member) -> bool:
 SECTION_TITLES = {
     "DocstringSectionParameters": "Parameters",
     "DocstringSectionReturns": "Returns",
+    "DocstringSectionYields": "Yields",
     "DocstringSectionRaises": "Raises",
     "DocstringSectionAttributes": "Attributes",
     "DocstringSectionExamples": "Examples",
@@ -101,7 +102,8 @@ def _strip_type_prefix(desc, ann) -> str:
 
 def _item_lines(label: str, desc) -> list[str]:
     lines = str(desc or "").splitlines()
-    first = f"- {label}:" + (f" {lines[0]}" if lines else "")
+    prefix = f"- {label}: " if label else "- "
+    first = prefix + (lines[0] if lines else "")
     return [first] + ["  " + l for l in lines[1:]]
 
 
@@ -160,8 +162,9 @@ def emit_section(section, out: list[str], fmt: str) -> None:
         "DocstringSectionAttributes",
         "DocstringSectionRaises",
         "DocstringSectionReturns",
+        "DocstringSectionYields",
     ):
-        if name == "DocstringSectionReturns":
+        if name in ("DocstringSectionReturns", "DocstringSectionYields"):
             out.append("| Type | Description |")
             out.append("| --- | --- |")
             for it in items:
@@ -190,9 +193,15 @@ def emit_section(section, out: list[str], fmt: str) -> None:
         pname = str(getattr(item, "name", "") or "")
         if name in ("DocstringSectionParameters", "DocstringSectionAttributes"):
             label = f"`{pname}`" + (f" (`{ann}`)" if ann else "")
-        elif name == "DocstringSectionReturns":
-            label = f"`{ann or pname}`" if (ann or pname) else ""
-            desc = _strip_type_prefix(desc, ann or pname)
+        elif name in ("DocstringSectionReturns", "DocstringSectionYields"):
+            ann = ann or pname
+            if not ann and desc and ":" in str(desc):
+                # griffe sometimes leaves the type inside the description
+                head, _, rest = str(desc).partition(":")
+                if "\n" not in head and rest.strip():
+                    ann, desc = head.strip(), rest.strip()
+            label = f"`{ann}`" if ann else ""
+            desc = _strip_type_prefix(desc, ann)
         elif name == "DocstringSectionRaises":
             label = f"`{ann}`" if ann else ""
         else:
