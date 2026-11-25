@@ -8,7 +8,6 @@ import data_source.source_football_data_co_uk as fd
 
 
 class MatchesIterator:
-
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
     def __init__(self, df: pd.DataFrame, window: int, reverse: bool = False):
         self.window = window
@@ -48,19 +47,14 @@ class MatchesIterator:
 
 
 def convert_res_val(home: bool, res: Literal['H', 'D', 'A']) -> int:
+    
     """
+    Parameters:
+        home (bool): whether the team was playing home
+        res (Literal['H', 'D', 'A']): literal from football-data.co.uk specifying who won
 
-    Parameters
-    ----------
-    home - whether the team was playing home
-    res - literal from football-data-co.uk specifying who won
-
-    Returns
-    -------
-    0 the team won
-    1 draw
-    2 the team lost
-
+    Returns:
+        int: 0 the team won, 1 draw, 2 the team lost
     """
 
     if res == 'D':
@@ -80,15 +74,11 @@ def convert_res_val(home: bool, res: Literal['H', 'D', 'A']) -> int:
 
 def convert_res_val_target(res: Literal['H', 'D', 'A']) -> int:
     """
+    Parameters:
+        res (Literal['H', 'D', 'A']): result of a match
 
-    Parameters
-    ----------
-    res - result of a match
-
-    Returns
-    -------
-    return 0 if home won, 1 if drawn, 2 if away won
-
+    Returns:
+        int: 0 if home won, 1 if drawn, 2 if away won
     """
     match res:
         case 'H':
@@ -103,26 +93,22 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
     """
     Creates training data for just last n matches results.
 
-    Parameters
-    ----------
-    leagues: what leagues to query.
-    seasons: what seasons to query.
-    window: how many last matches to include.
+    Parameters:
+        leagues (list[str]): what leagues to query.
+        seasons (list[int]): what seasons to query.
+        window (int): how many last matches to include.
 
-    Returns
-    -------
-    tuple[np.ndarray, np.ndarray]
-        Train values and targets, values are first n values for window of home team, then n values for window
-        of away team, values are:
-            -1 did not play - only for windows where there weren't enough previous matches played
-            0 team won
-            1 draw
-            2 team lost
+    Returns:
+        tuple[np.ndarray, np.ndarray]: train values and targets, values are first n values for window of
+        home team, then n values for window of away team, values are:
+        -1 did not play - only for windows where there weren't enough previous matches played
+        0 team won
+        1 draw
+        2 team lost
         Targets have values of results of those matches, values are:
-            0 home won
-            1 draw
-            2 away won
-
+        0 home won
+        1 draw
+        2 away won
     """
     df = fd.download_data(leagues, seasons, MatchesIterator.columns, include_season=False)
     df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
@@ -133,18 +119,14 @@ def create_windows_train_data(leagues: list[str], seasons: list[int], window: in
 
 def _build_team_form(df: pd.DataFrame, window: int) -> tuple[np.ndarray, np.ndarray]:
     """
-    Build training data from specified data frame
+    Build training data from specified data frame.
 
-    Parameters
-    ----------
-    df - match data to process
-    columns - columns to include
-    window - number of previous mathces to include
+    Parameters:
+        df (pd.DataFrame): match data to process
+        window (int): number of previous matches to include
 
-    Returns
-    -------
-    Training data
-
+    Returns:
+        tuple[np.ndarray, np.ndarray]: training data
     """
     n_rows = len(df)
     n_features = window * 2
@@ -163,16 +145,14 @@ def create_windows_for_fixtures(leagues: list[str], season: int, fixtures: pd.Da
     """
     Creates feature rows for matches that have not been played yet.
 
-    Parameters
-    ----------
-    leagues: what leagues need history
-    season: what season use for creating the history
-    fixtures: DataFrame with at least HomeTeam and AwayTeam columns (e.g. upcoming matches).
-    window: how many last matches per team to include.
+    Parameters:
+        leagues (list[str]): what leagues need history
+        season (int): what season to use for creating the history
+        fixtures (pd.DataFrame): DataFrame with at least HomeTeam and AwayTeam columns (e.g. upcoming matches).
+        window (int): how many last matches per team to include.
 
-    Returns
-    -------
-    Data for inference
+    Returns:
+        dict[tuple[str, str], tuple[list[int], list[int]]]: data for inference
     """
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
     df = fd.download_data(leagues, [season], columns, include_season=False)
