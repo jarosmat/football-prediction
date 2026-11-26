@@ -2,27 +2,29 @@
 
 Automatically generated after inference run.
 
+Current log loss: 1.010531416475519
+
 ## 2026-11-23
 
 | Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-23 |  | Brentford | Everton | 0.39873 | 0.25427 | 0.347 | H | H |
+| 2026-11-23 |  | Brentford | Everton | 0.39872812 | 0.25427156 | 0.34700032 | H | H |
 
 ## 2026-11-22
 
 | Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-22 |  | Hull | Brighton | 0.32696 | 0.23755 | 0.43548 | A | H |
-| 2026-11-22 |  | Liverpool | Man United | 0.59853 | 0.20599 | 0.19548 | H | H |
+| 2026-11-22 |  | Hull | Brighton | 0.32696443 | 0.23755312 | 0.43548245 | A | H |
+| 2026-11-22 |  | Liverpool | Man United | 0.59852994 | 0.20599402 | 0.19547604 | H | H |
 
 ## 2026-11-21
 
 | Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-21 |  | Man City | Fulham | 0.31056 | 0.26935 | 0.42008 | A | D |
-| 2026-11-21 |  | Coventry | Crystal Palace | 0.50653 | 0.31497 | 0.1785 | H | H |
-| 2026-11-21 |  | Tottenham | Ipswich | 0.52499 | 0.26469 | 0.21033 | H | H |
-| 2026-11-21 |  | Chelsea | Leeds | 0.43989 | 0.24716 | 0.31295 | H | A |
-| 2026-11-21 |  | Bournemouth | Nott'm Forest | 0.58988 | 0.18535 | 0.22477 | H | H |
-| 2026-11-21 |  | Aston Villa | Sunderland | 0.56347 | 0.18827 | 0.24826 | H | D |
-| 2026-11-21 |  | Newcastle | Arsenal | 0.36564 | 0.21036 | 0.42399 | A | D |
+| 2026-11-21 |  | Man City | Fulham | 0.310564 | 0.26935493 | 0.42008107 | A | D |
+| 2026-11-21 |  | Coventry | Crystal Palace | 0.50653062 | 0.3149717 | 0.17849768 | H | H |
+| 2026-11-21 |  | Tottenham | Ipswich | 0.52498921 | 0.26468558 | 0.21032521 | H | H |
+| 2026-11-21 |  | Chelsea | Leeds | 0.43989091 | 0.2471632 | 0.31294589 | H | A |
+| 2026-11-21 |  | Bournemouth | Nott'm Forest | 0.58987913 | 0.18534874 | 0.22477214 | H | H |
+| 2026-11-21 |  | Aston Villa | Sunderland | 0.56347431 | 0.18826575 | 0.24825995 | H | D |
+| 2026-11-21 |  | Newcastle | Arsenal | 0.36564194 | 0.21036329 | 0.42399477 | A | D |

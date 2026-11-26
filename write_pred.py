@@ -1,7 +1,12 @@
 import argparse
+
+import numpy as np
 import pandas as pd
 from pathlib import Path
 import os
+
+import sklearn
+
 from data_source.source_upcoming_matches import get_matches_played_today
 from data_source.team_names import to_football_data
 from datetime import date
@@ -83,12 +88,10 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
                 current = line[3:].strip()
                 if current is not None:
                     sections[current] = []
-            elif current is None:
-                preamble.append(line)
-            else:
+            elif current is not None:
                 sections[current].append(line)
-    else:
-        preamble = ["# Prediction results", "", "Automatically generated after inference run.", ""]
+
+    preamble = ["# Prediction results", "", "Automatically generated after inference run.", ""]
 
     dfs: dict[str, pd.DataFrame] = {}
 
@@ -130,7 +133,27 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
             loc = len(frame.columns)
             frame.insert(loc, RESULT_COL, col_vals)
 
+    pred_proba = []
+    true = []
 
+    for d, frame in dfs.items():
+        if RESULT_COL in frame.columns:
+            for r, p_home, p_draw, p_away in zip(frame["Result"].to_numpy() , frame["p_home"].to_numpy(dtype=np.float64) , frame["p_draw"].to_numpy(dtype=np.float64),frame["p_away"].to_numpy(dtype=np.float64)):
+                if r == 'H':
+                    true.append(0)
+                elif r == 'D':
+                    true.append(1)
+                else:
+                    true.append(2)
+
+                distr = [p_home, p_draw, p_away]
+                pred_proba.append(distr)
+
+    if pred_proba and true:
+        log_los = sklearn.metrics.log_loss(true, pred_proba)
+
+        preamble.append(f"Current log loss: {log_los}")
+        preamble.append("")
 
 
 
@@ -155,7 +178,7 @@ def parse_args() -> argparse.Namespace:
                    help="CSV file to write predictions to.")
     p.add_argument("--dest", type=Path, default=Path("docs/Predictions.md"),
                    help="Markdown file to write the predictions table to.")
-    p.add_argument("--accuracy", type=int, default=5,
+    p.add_argument("--accuracy", type=int, default=8,
                    help="Number of decimal places to display for match result probabilities.")
     p.add_argument("--api-key", default=os.environ.get("API_NINJAS_KEY"),
                    help="API Ninjas key (or set the API_NINJAS_KEY env var).")
