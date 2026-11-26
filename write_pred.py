@@ -1,8 +1,11 @@
 import argparse
 import pandas as pd
 from pathlib import Path
+import os
+from data_source.source_upcoming_matches import get_matches_played_today
+from datetime import date
 
-
+RESULT_COL = "Result"
 
 def dataframe_to_markdown(df: pd.DataFrame) -> list[str]:
     """
@@ -53,7 +56,7 @@ def markdown_to_dataframe(markdown: str, accuracy: int) -> pd.DataFrame:
 
 
 
-def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accuracy: int):
+def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accuracy: int, api_key: str):
     """
     Writes predictions for a day into the Markdown file.
 
@@ -65,6 +68,7 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
         day (str): Day the predictions are for, in ISO format (YYYY-MM-DD).
         predictions (pd.DataFrame): Predictions for the day.
         accuracy (int): Number of decimal places to display for match result probabilities.
+        api_key (str): API Ninjas API key.
     """
 
     sections: dict[str, list[str]] = {}
@@ -90,6 +94,15 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
 
     dfs[day] = predictions.round(accuracy)
 
+    league = 'epl'
+
+    for d, frame in dfs.items():
+        if RESULT_COL not in frame.columns and d != day:
+            matches = get_matches_played_today(api_key, [league], date.fromisoformat(d))
+
+
+
+
 
 
     body = "\n\n".join(f"## {d}\n\n" + "\n".join(dataframe_to_markdown(frame)).strip("\n")
@@ -112,6 +125,8 @@ def parse_args() -> argparse.Namespace:
                    help="Markdown file to write the predictions table to.")
     p.add_argument("--accuracy", type=int, default=5,
                    help="Number of decimal places to display for match result probabilities.")
+    p.add_argument("--api-key", default=os.environ.get("API_NINJAS_KEY"),
+                   help="API Ninjas key (or set the API_NINJAS_KEY env var).")
     return p.parse_args()
 
 
@@ -123,7 +138,7 @@ def main(args: argparse.Namespace):
        raise SystemExit("Valid CSV file needed.")
 
     day = str(df["Date"].iloc[0])
-    update_predictions_md(args.dest, day, df, args.accuracy)
+    update_predictions_md(args.dest, day, df, args.accuracy, args.api_key)
     print(f"predictions for {day} written to {args.dest}")
 
 if __name__ == "__main__":
