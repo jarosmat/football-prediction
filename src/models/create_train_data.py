@@ -174,7 +174,7 @@ def create_windows_for_fixtures(leagues: list[str], season: int, fixtures: pd.Da
         dict[tuple[str, str], tuple[list[int], list[int]]]: data for inference
     """
     columns = ['Div', 'Date', 'HomeTeam', 'AwayTeam', 'FTR']
-    df = fd.download_data(leagues, [season], columns, include_season=False)
+    df = fd.download_data(leagues, [season], columns, include_season=False, force_download=True)
     df['Date'] = df['Date'].transform(lambda time: pd.to_datetime(time, format='%d/%m/%Y'))
 
     mati = MatchesIterator(df, window)
