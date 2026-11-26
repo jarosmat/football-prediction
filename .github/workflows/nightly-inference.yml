@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   predict:
@@ -14,6 +14,8 @@ jobs:
     defaults:
       run:
         shell: devenv shell -- bash -e {0}
+    env:
+      PREDICTION_FILE: "predictions/$(date +%F).csv"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -38,7 +40,13 @@ jobs:
           mkdir -p predictions
           python src/models/inference_window_model.py \
             --model log_reg_window_trained.model \
-            --output "predictions/$(date +%F).csv"
+            --output ${{ env.PREDICTION_FILE }}
+
+      - name: Write predictions to docs
+        env:
+          API_NINJAS_KEY: ${{ secrets.APININJAS }}
+          PYTHONPATH: src
+        run: python write_pred.py --predictions ${{ env.PREDICTION_FILE }} --dest docs/Predictions.md
 
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4
@@ -46,3 +54,9 @@ jobs:
           name: predictions-${{ github.run_id }}
           path: predictions/*.csv
           retention-days: 90
+
+      - name: Commit predictions to docs
+        run: |
+          git config user.name ${{ github.actor }}
+          git add docs/Predictions.md
+          git diff-index --quiet HEAD || (git commit -m "Update predictions [skip ci]" && git push origin HEAD:master)
