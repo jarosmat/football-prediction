@@ -20,6 +20,36 @@ def dataframe_to_markdown(df: pd.DataFrame) -> list[str]:
         lines.append("| " + " | ".join("" if pd.isna(value) else str(value) for value in row) + " |")
     return lines
 
+def markdown_to_dataframe(markdown: str) -> pd.DataFrame:
+    """
+    Converts a multiline string containing Markdown table into DataFrame.
+
+    Args:
+        markdown (str): Multiline string containing Markdown table.
+
+    Returns:
+        pd.DataFrame: Resulting DataFrame
+    """
+    lines = markdown.strip('\n').split('\n')
+    header = lines[0].strip('|').split('|')
+
+    data = []
+    for line in lines[2:]:
+        if not line:
+            break
+
+        cols = line.strip('|').split('|')
+
+        row = dict(zip(header, cols))
+        data.append(row)
+
+
+    df = pd.DataFrame(data)
+
+    return df
+
+
+
 
 
 def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accuracy: int):
