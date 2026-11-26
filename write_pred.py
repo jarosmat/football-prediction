@@ -95,7 +95,8 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
     for d, section in sections.items():
         dfs[d] = markdown_to_dataframe('\n'.join(section), accuracy)
 
-    dfs[day] = predictions.round(accuracy)
+    if day not in dfs:
+        dfs[day] = predictions.round(accuracy)
 
     league = 'epl'
 
