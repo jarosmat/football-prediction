@@ -20,12 +20,13 @@ def dataframe_to_markdown(df: pd.DataFrame) -> list[str]:
         lines.append("| " + " | ".join("" if pd.isna(value) else str(value) for value in row) + " |")
     return lines
 
-def markdown_to_dataframe(markdown: str) -> pd.DataFrame:
+def markdown_to_dataframe(markdown: str, accuracy: int) -> pd.DataFrame:
     """
     Converts a multiline string containing Markdown table into DataFrame.
 
     Args:
         markdown (str): Multiline string containing Markdown table.
+        accuracy (int): Number of decimal places to display for match result probabilities.
 
     Returns:
         pd.DataFrame: Resulting DataFrame
@@ -44,7 +45,7 @@ def markdown_to_dataframe(markdown: str) -> pd.DataFrame:
         data.append(row)
 
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data).round(accuracy)
 
     return df
 
@@ -82,10 +83,17 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
     else:
         preamble = ["# Prediction results", "", "Automatically generated after inference run.", ""]
 
-    sections[day] = dataframe_to_markdown(predictions.round(accuracy))
+    dfs: dict[str, pd.DataFrame] = {}
 
-    body = "\n\n".join(f"## {d}\n\n" + "\n".join(lines).strip("\n")
-                       for d, lines in sorted(sections.items(), reverse=True))
+    for d, section in sections.items():
+        dfs[d] = markdown_to_dataframe('\n'.join(section), accuracy)
+
+    dfs[day] = predictions.round(accuracy)
+
+
+
+    body = "\n\n".join(f"## {d}\n\n" + "\n".join(dataframe_to_markdown(frame)).strip("\n")
+                   for d, frame in sorted(dfs.items(), reverse=True))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(preamble).rstrip() + "\n\n" + body + "\n")
 
