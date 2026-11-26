@@ -46,7 +46,7 @@ jobs:
         env:
           API_NINJAS_KEY: ${{ secrets.APININJAS }}
           PYTHONPATH: src
-        run: python write_pred.py --predictions ${{ env.PREDICTION_FILE }} --dest docs/Predictions.md
+        run: [ -f ${{ env.PREDICTION_FILE }} ] && python write_pred.py --predictions ${{ env.PREDICTION_FILE }} --dest docs/Predictions.md || echo "Could not find predictions file, skipping"
 
       - name: Upload predictions as run artifact
         uses: actions/upload-artifact@v4

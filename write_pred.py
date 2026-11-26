@@ -164,7 +164,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def main(args: argparse.Namespace):
-    df = pd.read_csv(args.predictions)
+    try:
+        df = pd.read_csv(args.predictions)
+    except FileNotFoundError:
+        raise SystemExit("Prediction results file not found.")
 
     if not isinstance(df, pd.DataFrame):
        raise SystemExit("Valid CSV file needed.")
