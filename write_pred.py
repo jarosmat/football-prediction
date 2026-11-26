@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import os
 from data_source.source_upcoming_matches import get_matches_played_today
+from data_source.team_names import to_football_data
 from datetime import date
 
 RESULT_COL = "Result"
@@ -35,14 +36,16 @@ def markdown_to_dataframe(markdown: str, accuracy: int) -> pd.DataFrame:
         pd.DataFrame: Resulting DataFrame
     """
     lines = markdown.strip('\n').split('\n')
-    header = lines[0].strip('|').split('|')
+    header_vals = lines[0].strip('|').split('|')
+    header = list(map(str.strip, header_vals))
 
     data = []
     for line in lines[2:]:
         if not line:
             break
 
-        cols = line.strip('|').split('|')
+        col_vals = line.strip('|').split('|')
+        cols = list(map(str.strip, col_vals))
 
         row = dict(zip(header, cols))
         data.append(row)
@@ -99,6 +102,34 @@ def update_predictions_md(path: Path, day: str, predictions: pd.DataFrame, accur
     for d, frame in dfs.items():
         if RESULT_COL not in frame.columns and d != day:
             matches = get_matches_played_today(api_key, [league], date.fromisoformat(d))
+            results: dict[str, str] = {}
+            for match in matches[league]:
+                home_team = to_football_data(match.get("home_team").get("name"))
+                try:
+                    home_score = int(match.get("home_score"))
+                    away_score = int(match.get("away_score"))
+                    if home_score < away_score:
+                        res = 'A'
+                    elif home_score > away_score:
+                        res = 'H'
+                    else:
+                        res = 'D'
+                except ValueError:
+                    results[home_team] = "Unknown"
+                    continue
+                results[home_team] = res
+
+            col_vals = []
+            for home in frame["HomeTeam"]:
+                if home in results:
+                    col_vals.append(results[home])
+                else:
+                    col_vals.append("Unknown")
+
+            loc = len(frame.columns)
+            frame.insert(loc, RESULT_COL, col_vals)
+
+
 
 
 
