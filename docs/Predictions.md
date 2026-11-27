@@ -4,6 +4,12 @@ Automatically generated after inference run.
 
 Current log loss: 1.010531416475519
 
+## 2026-11-27
+
+| Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-27 |  | Nott'm Forest | Chelsea | 0.38771591 | 0.3227153 | 0.28956879 | H |
+
 ## 2026-11-23
 
 | Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted | Result |
