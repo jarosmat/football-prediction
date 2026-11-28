@@ -2,13 +2,21 @@
 
 Automatically generated after inference run.
 
-Current log loss: 1.010531416475519
+Current log loss: 1.0047996875471132
 
-## 2026-11-27
+## 2026-11-28
 
 | Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-27 |  | Nott'm Forest | Chelsea | 0.38771591 | 0.3227153 | 0.28956879 | H |
+| 2026-11-28 |  | Man United | Brentford | 0.29141766 | 0.25696598 | 0.45161636 | A |
+| 2026-11-28 |  | Leeds | Coventry | 0.47672597 | 0.24059061 | 0.28268342 | H |
+| 2026-11-28 |  | Ipswich | Aston Villa | 0.34901837 | 0.24017528 | 0.41080635 | A |
+
+## 2026-11-27
+
+| Date | Time | HomeTeam | AwayTeam | p_home | p_draw | p_away | predicted | Result |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-27 |  | Nott'm Forest | Chelsea | 0.38771591 | 0.3227153 | 0.28956879 | H | H |
 
 ## 2026-11-23
 
